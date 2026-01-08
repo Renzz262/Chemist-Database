@@ -1,1 +1,95 @@
-CREATE
+CREATE TABLE medication_categories (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    category_name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT
+) ENGINE=InnoDB;
+
+CREATE TABLE medications (
+    medication_id INT AUTO_INCREMENT PRIMARY KEY,
+    medication_name VARCHAR(150) NOT NULL,
+    category_id INT NOT NULL,
+    dosage_form VARCHAR(50),
+    unit_price DECIMAL(10,2) NOT NULL,
+    reorder_level INT DEFAULT 10,
+    CONSTRAINT fk_med_category
+        FOREIGN KEY (category_id)
+        REFERENCES medication_categories(category_id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE inventory (
+    inventory_id INT AUTO_INCREMENT PRIMARY KEY,
+    medication_id INT NOT NULL,
+    batch_number VARCHAR(50) NOT NULL,
+    quantity_in_stock INT NOT NULL,
+    expiry_date DATE NOT NULL,
+    status VARCHAR(20) DEFAULT 'Normal',
+    CONSTRAINT fk_inventory_med
+        FOREIGN KEY (medication_id)
+        REFERENCES medications(medication_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE suppliers (
+    supplier_id INT AUTO_INCREMENT PRIMARY KEY,
+    supplier_name VARCHAR(150) NOT NULL,
+    contact_phone VARCHAR(20),
+    email VARCHAR(100)
+) ENGINE=InnoDB;
+
+CREATE TABLE purchases (
+    purchase_id INT AUTO_INCREMENT PRIMARY KEY,
+    supplier_id INT NOT NULL,
+    purchase_date DATE NOT NULL,
+    total_cost DECIMAL(12,2),
+    CONSTRAINT fk_purchase_supplier
+        FOREIGN KEY (supplier_id)
+        REFERENCES suppliers(supplier_id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE purchase_details (
+    purchase_detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    purchase_id INT NOT NULL,
+    medication_id INT NOT NULL,
+    quantity_purchased INT NOT NULL,
+    cost_price DECIMAL(10,2) NOT NULL,
+    CONSTRAINT fk_pd_purchase
+        FOREIGN KEY (purchase_id)
+        REFERENCES purchases(purchase_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_pd_medication
+        FOREIGN KEY (medication_id)
+        REFERENCES medications(medication_id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE sales (
+    sale_id INT AUTO_INCREMENT PRIMARY KEY,
+    sale_date DATETIME NOT NULL,
+    total_amount DECIMAL(12,2)
+) ENGINE=InnoDB;
+
+CREATE TABLE sale_details (
+    sale_detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    sale_id INT NOT NULL,
+    medication_id INT NOT NULL,
+    quantity_sold INT NOT NULL,
+    selling_price DECIMAL(10,2) NOT NULL,
+    CONSTRAINT fk_sd_sale
+        FOREIGN KEY (sale_id)
+        REFERENCES sales(sale_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_sd_medication
+        FOREIGN KEY (medication_id)
+        REFERENCES medications(medication_id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
