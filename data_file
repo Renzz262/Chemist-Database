@@ -20,7 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `pharmacy_db`
 --
-
 --
 -- Dumping data for table `medications`
 --
