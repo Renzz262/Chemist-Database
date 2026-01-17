@@ -1,28 +1,4 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1
--- Generation Time: Jan 15, 2026 at 11:51 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `pharmacy_db`
---
---
--- Dumping data for table `medications`
---
+/*medication data*/
 
 INSERT INTO `medications` (`medication_id`, `medication_name`, `category_id`, `dosage_form`, `unit_price`, `reorder_level`) VALUES
 (9, 'Antibiotic_001', 6, 'Tablet', 66.97, 30),
@@ -786,9 +762,7 @@ INSERT INTO `medications` (`medication_id`, `medication_name`, `category_id`, `d
 (1477, 'Digestive_069', 13, 'Tablet', 53.93, 20),
 (1478, 'Digestive_070', 13, 'Tablet', 69.21, 20);
 
---
--- Dumping data for table `medication_categories`
---
+/*medication_categories*/
 
 INSERT INTO `medication_categories` (`category_id`, `category_name`, `description`) VALUES
 (6, 'Antibiotics', 'Bacterial infection treatment'),
@@ -801,6 +775,3 @@ INSERT INTO `medication_categories` (`category_id`, `category_name`, `descriptio
 (13, 'Digestive', 'Digestive system medicines');
 COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
