@@ -762,7 +762,7 @@ INSERT INTO `medications` (`medication_id`, `medication_name`, `category_id`, `d
 (1477, 'Digestive_069', 13, 'Tablet', 53.93, 20),
 (1478, 'Digestive_070', 13, 'Tablet', 69.21, 20);
 
-/*medication_categories*/
+/*medication_categories data*/
 
 INSERT INTO `medication_categories` (`category_id`, `category_name`, `description`) VALUES
 (6, 'Antibiotics', 'Bacterial infection treatment'),
