@@ -1,0 +1,427 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Jan 21, 2026 at 07:00 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
+SET FOREIGN_KEY_CHECKS=0;
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `pharmacy_db`
+--
+CREATE DATABASE IF NOT EXISTS `pharmacy_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `pharmacy_db`;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory`
+--
+-- Creation: Jan 17, 2026 at 09:56 AM
+--
+
+DROP TABLE IF EXISTS `inventory`;
+CREATE TABLE IF NOT EXISTS `inventory` (
+  `inventory_id` int(11) NOT NULL AUTO_INCREMENT,
+  `med_id` int(11) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`inventory_id`),
+  KEY `med_id` (`med_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- RELATIONSHIPS FOR TABLE `inventory`:
+--   `med_id`
+--       `medications` -> `med_id`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `medications`
+--
+-- Creation: Jan 17, 2026 at 09:55 AM
+--
+
+DROP TABLE IF EXISTS `medications`;
+CREATE TABLE IF NOT EXISTS `medications` (
+  `med_id` int(11) NOT NULL AUTO_INCREMENT,
+  `med_name` varchar(100) NOT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  PRIMARY KEY (`med_id`),
+  KEY `category_id` (`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- RELATIONSHIPS FOR TABLE `medications`:
+--   `category_id`
+--       `medication_categories` -> `category_id`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `medication_categories`
+--
+-- Creation: Jan 21, 2026 at 10:43 AM
+-- Last update: Jan 21, 2026 at 10:43 AM
+--
+
+DROP TABLE IF EXISTS `medication_categories`;
+CREATE TABLE IF NOT EXISTS `medication_categories` (
+  `category_id` int(11) NOT NULL AUTO_INCREMENT,
+  `category_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`category_id`),
+  UNIQUE KEY `category_name` (`category_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- RELATIONSHIPS FOR TABLE `medication_categories`:
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `purchases`
+--
+-- Creation: Jan 17, 2026 at 09:56 AM
+--
+
+DROP TABLE IF EXISTS `purchases`;
+CREATE TABLE IF NOT EXISTS `purchases` (
+  `purchase_id` int(11) NOT NULL AUTO_INCREMENT,
+  `supplier_id` int(11) DEFAULT NULL,
+  `purchase_date` date DEFAULT NULL,
+  `total_amount` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`purchase_id`),
+  KEY `supplier_id` (`supplier_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- RELATIONSHIPS FOR TABLE `purchases`:
+--   `supplier_id`
+--       `suppliers` -> `supplier_id`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `purchase_details`
+--
+-- Creation: Jan 17, 2026 at 09:56 AM
+--
+
+DROP TABLE IF EXISTS `purchase_details`;
+CREATE TABLE IF NOT EXISTS `purchase_details` (
+  `purchase_detail_id` int(11) NOT NULL AUTO_INCREMENT,
+  `purchase_id` int(11) DEFAULT NULL,
+  `med_id` int(11) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `cost` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`purchase_detail_id`),
+  KEY `purchase_id` (`purchase_id`),
+  KEY `med_id` (`med_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- RELATIONSHIPS FOR TABLE `purchase_details`:
+--   `purchase_id`
+--       `purchases` -> `purchase_id`
+--   `med_id`
+--       `medications` -> `med_id`
+--
+
+--
+-- Triggers `purchase_details`
+--
+DROP TRIGGER IF EXISTS `trg_increase_stock_after_purchase`;
+DELIMITER $$
+CREATE TRIGGER `trg_increase_stock_after_purchase` AFTER INSERT ON `purchase_details` FOR EACH ROW BEGIN
+  UPDATE inventory
+  SET quantity = quantity + NEW.quantity
+  WHERE med_id = NEW.med_id;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sales`
+--
+-- Creation: Jan 17, 2026 at 09:56 AM
+--
+
+DROP TABLE IF EXISTS `sales`;
+CREATE TABLE IF NOT EXISTS `sales` (
+  `sale_id` int(11) NOT NULL AUTO_INCREMENT,
+  `sale_date` date DEFAULT NULL,
+  `total_amount` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`sale_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- RELATIONSHIPS FOR TABLE `sales`:
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sale_details`
+--
+-- Creation: Jan 17, 2026 at 09:57 AM
+--
+
+DROP TABLE IF EXISTS `sale_details`;
+CREATE TABLE IF NOT EXISTS `sale_details` (
+  `sale_detail_id` int(11) NOT NULL AUTO_INCREMENT,
+  `sale_id` int(11) DEFAULT NULL,
+  `med_id` int(11) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`sale_detail_id`),
+  KEY `sale_id` (`sale_id`),
+  KEY `med_id` (`med_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- RELATIONSHIPS FOR TABLE `sale_details`:
+--   `sale_id`
+--       `sales` -> `sale_id`
+--   `med_id`
+--       `medications` -> `med_id`
+--
+
+--
+-- Triggers `sale_details`
+--
+DROP TRIGGER IF EXISTS `trg_prevent_negative_stock`;
+DELIMITER $$
+CREATE TRIGGER `trg_prevent_negative_stock` BEFORE INSERT ON `sale_details` FOR EACH ROW BEGIN
+  DECLARE current_stock INT;
+
+  SELECT quantity INTO current_stock
+  FROM inventory
+  WHERE med_id = NEW.med_id;
+
+  IF current_stock < NEW.quantity THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Insufficient stock for this medication';
+  END IF;
+END
+$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS `trg_reduce_stock_after_sale`;
+DELIMITER $$
+CREATE TRIGGER `trg_reduce_stock_after_sale` AFTER INSERT ON `sale_details` FOR EACH ROW BEGIN
+  UPDATE inventory
+  SET quantity = quantity - NEW.quantity
+  WHERE med_id = NEW.med_id;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `suppliers`
+--
+-- Creation: Jan 17, 2026 at 09:56 AM
+--
+
+DROP TABLE IF EXISTS `suppliers`;
+CREATE TABLE IF NOT EXISTS `suppliers` (
+  `supplier_id` int(11) NOT NULL AUTO_INCREMENT,
+  `supplier_name` varchar(100) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  `address` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`supplier_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- RELATIONSHIPS FOR TABLE `suppliers`:
+--
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `view_low_stock`
+-- (See below for the actual view)
+--
+DROP VIEW IF EXISTS `view_low_stock`;
+CREATE TABLE IF NOT EXISTS `view_low_stock` (
+`med_id` int(11)
+,`med_name` varchar(100)
+,`category_name` varchar(100)
+,`quantity` decimal(33,0)
+,`price` decimal(42,2)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `view_medication_inventory`
+-- (See below for the actual view)
+--
+DROP VIEW IF EXISTS `view_medication_inventory`;
+CREATE TABLE IF NOT EXISTS `view_medication_inventory` (
+`med_id` int(11)
+,`med_name` varchar(100)
+,`category_name` varchar(100)
+,`quantity` decimal(33,0)
+,`price` decimal(42,2)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `view_purchase_details`
+-- (See below for the actual view)
+--
+DROP VIEW IF EXISTS `view_purchase_details`;
+CREATE TABLE IF NOT EXISTS `view_purchase_details` (
+`purchase_id` int(11)
+,`purchase_date` date
+,`med_id` int(11)
+,`med_name` varchar(100)
+,`quantity` int(11)
+,`cost` decimal(10,2)
+,`total_cost` decimal(20,2)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `view_sales_details`
+-- (See below for the actual view)
+--
+DROP VIEW IF EXISTS `view_sales_details`;
+CREATE TABLE IF NOT EXISTS `view_sales_details` (
+`sale_id` int(11)
+,`sale_date` date
+,`med_id` int(11)
+,`med_name` varchar(100)
+,`quantity` int(11)
+,`price` decimal(10,2)
+,`total_price` decimal(20,2)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `view_sales_summary`
+-- (See below for the actual view)
+--
+DROP VIEW IF EXISTS `view_sales_summary`;
+CREATE TABLE IF NOT EXISTS `view_sales_summary` (
+`med_name` varchar(100)
+,`total_sold` decimal(32,0)
+,`total_sales` decimal(42,2)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `view_low_stock`
+--
+DROP TABLE IF EXISTS `view_low_stock`;
+
+DROP VIEW IF EXISTS `view_low_stock`;
+CREATE OR REPLACE VIEW `view_low_stock`  AS SELECT `view_medication_inventory`.`med_id` AS `med_id`, `view_medication_inventory`.`med_name` AS `med_name`, `view_medication_inventory`.`category_name` AS `category_name`, `view_medication_inventory`.`quantity` AS `quantity`, `view_medication_inventory`.`price` AS `price` FROM `view_medication_inventory` WHERE `view_medication_inventory`.`quantity` <= 10 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `view_medication_inventory`
+--
+DROP TABLE IF EXISTS `view_medication_inventory`;
+
+DROP VIEW IF EXISTS `view_medication_inventory`;
+CREATE OR REPLACE VIEW `view_medication_inventory`  AS SELECT `m`.`med_id` AS `med_id`, `m`.`med_name` AS `med_name`, `c`.`category_name` AS `category_name`, ifnull(sum(`pd`.`quantity`),0) - ifnull(sum(`sd`.`quantity`),0) AS `quantity`, ifnull(sum(`sd`.`price` * `sd`.`quantity`),0) AS `price` FROM (((`medications` `m` join `medication_categories` `c` on(`m`.`category_id` = `c`.`category_id`)) left join `purchase_details` `pd` on(`m`.`med_id` = `pd`.`med_id`)) left join `sale_details` `sd` on(`m`.`med_id` = `sd`.`med_id`)) GROUP BY `m`.`med_id`, `m`.`med_name`, `c`.`category_name` ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `view_purchase_details`
+--
+DROP TABLE IF EXISTS `view_purchase_details`;
+
+DROP VIEW IF EXISTS `view_purchase_details`;
+CREATE OR REPLACE VIEW `view_purchase_details`  AS SELECT `p`.`purchase_id` AS `purchase_id`, `p`.`purchase_date` AS `purchase_date`, `pd`.`med_id` AS `med_id`, `m`.`med_name` AS `med_name`, `pd`.`quantity` AS `quantity`, `pd`.`cost` AS `cost`, `pd`.`quantity`* `pd`.`cost` AS `total_cost` FROM ((`purchases` `p` join `purchase_details` `pd` on(`p`.`purchase_id` = `pd`.`purchase_id`)) join `medications` `m` on(`pd`.`med_id` = `m`.`med_id`)) ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `view_sales_details`
+--
+DROP TABLE IF EXISTS `view_sales_details`;
+
+DROP VIEW IF EXISTS `view_sales_details`;
+CREATE OR REPLACE VIEW `view_sales_details`  AS SELECT `s`.`sale_id` AS `sale_id`, `s`.`sale_date` AS `sale_date`, `sd`.`med_id` AS `med_id`, `m`.`med_name` AS `med_name`, `sd`.`quantity` AS `quantity`, `sd`.`price` AS `price`, `sd`.`quantity`* `sd`.`price` AS `total_price` FROM ((`sales` `s` join `sale_details` `sd` on(`s`.`sale_id` = `sd`.`sale_id`)) join `medications` `m` on(`sd`.`med_id` = `m`.`med_id`)) ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `view_sales_summary`
+--
+DROP TABLE IF EXISTS `view_sales_summary`;
+
+DROP VIEW IF EXISTS `view_sales_summary`;
+CREATE OR REPLACE VIEW `view_sales_summary`  AS SELECT `m`.`med_name` AS `med_name`, sum(`sd`.`quantity`) AS `total_sold`, sum(`sd`.`quantity` * `sd`.`price`) AS `total_sales` FROM (`sale_details` `sd` join `medications` `m` on(`sd`.`med_id` = `m`.`med_id`)) GROUP BY `m`.`med_name` ;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `inventory`
+--
+ALTER TABLE `inventory`
+  ADD CONSTRAINT `inventory_ibfk_1` FOREIGN KEY (`med_id`) REFERENCES `medications` (`med_id`);
+
+--
+-- Constraints for table `medications`
+--
+ALTER TABLE `medications`
+  ADD CONSTRAINT `medications_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `medication_categories` (`category_id`);
+
+--
+-- Constraints for table `purchases`
+--
+ALTER TABLE `purchases`
+  ADD CONSTRAINT `purchases_ibfk_1` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`supplier_id`);
+
+--
+-- Constraints for table `purchase_details`
+--
+ALTER TABLE `purchase_details`
+  ADD CONSTRAINT `purchase_details_ibfk_1` FOREIGN KEY (`purchase_id`) REFERENCES `purchases` (`purchase_id`),
+  ADD CONSTRAINT `purchase_details_ibfk_2` FOREIGN KEY (`med_id`) REFERENCES `medications` (`med_id`);
+
+--
+-- Constraints for table `sale_details`
+--
+ALTER TABLE `sale_details`
+  ADD CONSTRAINT `sale_details_ibfk_1` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`sale_id`),
+  ADD CONSTRAINT `sale_details_ibfk_2` FOREIGN KEY (`med_id`) REFERENCES `medications` (`med_id`);
+SET FOREIGN_KEY_CHECKS=1;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
