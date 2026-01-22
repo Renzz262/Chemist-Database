@@ -229,7 +229,6 @@ CREATE OR REPLACE VIEW `view_purchase_details`  AS SELECT `p`.`purchase_id` AS `
 
 
 
-
 DROP TABLE IF EXISTS `view_sales_details`;
 
 DROP VIEW IF EXISTS `view_sales_details`;
