@@ -1545,9 +1545,11 @@ INSERT INTO `medication_categories` VALUES
 (25, 'Supplements'),
 (4, 'Vitamins');
 
+
 --
 -- Dumping data for table `purchases`
 --
+
 
 INSERT INTO `purchases` VALUES
 (1, 7, '2025-05-18', 605.40),
