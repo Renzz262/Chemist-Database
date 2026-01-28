@@ -1,7 +1,4 @@
-# Chemist Database Schema
-
-## Entity Relationship Diagram
-
+Database Schema 
 ```mermaid
 erDiagram
     MEDICATION_CATEGORIES {
