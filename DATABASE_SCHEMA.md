@@ -70,28 +70,28 @@ erDiagram
     MEDICATIONS ||--|{ SALE_DETAILS : "sold as"
 ```
 
-## Table Descriptions
+Table Descriptions
 
-### `medication_categories`
+### `The medication_categories table`
 Stores different categories of medications (e.g., Antibiotics, Painkillers).
 
-### `medications`
+### ` The medications table`
 Stores details of each medication, linked to a category.
 
-### `inventory`
+### `The inventory table`
 Tracks stock levels, batch numbers, and expiry dates for medications.
 
-### `suppliers`
+### `The suppliers table`
 Information about suppliers who provide medications.
 
-### `purchases`
+### `The purchases table `
 Records purchase transactions from suppliers.
 
-### `purchase_details`
+### `The purchase_details table `
 Line items for each purchase, linking medications to the purchase record.
 
-### `sales`
+### `The sales table `
 Records sales transactions to customers.
 
-### `sale_details`
+### `The sale_details table `
 Line items for each sale, detailing which medications were sold.
