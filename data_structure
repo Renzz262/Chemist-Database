@@ -130,7 +130,6 @@ CREATE TABLE IF NOT EXISTS `sale_details` (
   KEY `med_id` (`med_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
 -- Triggers `sale_details`
 
 DROP TRIGGER IF EXISTS `trg_prevent_negative_stock`;
@@ -199,7 +198,6 @@ CREATE TABLE IF NOT EXISTS `view_medication_inventory` (
 ,`price` decimal(42,2)
 );
 
-
 -- Stand-in structure for view `view_purchase_details`
 -- (See below for the actual view)
 
@@ -213,7 +211,6 @@ CREATE TABLE IF NOT EXISTS `view_purchase_details` (
 ,`cost` decimal(10,2)
 ,`total_cost` decimal(20,2)
 );
-
 
 -- Stand-in structure for view `view_sales_details`
 -- (See below for the actual view)
@@ -268,9 +265,6 @@ DROP TABLE IF EXISTS `view_purchase_details`;
 
 DROP VIEW IF EXISTS `view_purchase_details`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_purchase_details`  AS SELECT `p`.`purchase_id` AS `purchase_id`, `p`.`purchase_date` AS `purchase_date`, `pd`.`med_id` AS `med_id`, `m`.`med_name` AS `med_name`, `pd`.`quantity` AS `quantity`, `pd`.`cost` AS `cost`, `pd`.`quantity`* `pd`.`cost` AS `total_cost` FROM ((`purchases` `p` join `purchase_details` `pd` on(`p`.`purchase_id` = `pd`.`purchase_id`)) join `medications` `m` on(`pd`.`med_id` = `m`.`med_id`)) ;
-
-
-
 
 -- Structure for view `view_sales_details`
 
