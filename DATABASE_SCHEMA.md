@@ -1,4 +1,4 @@
-Database Schema 
+Database Schema
 ```mermaid
 erDiagram
     MEDICATION_CATEGORIES {
