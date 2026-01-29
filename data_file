@@ -1,5 +1,4 @@
 
-
 INSERT INTO `inventory` (`inventory_id`, `med_id`, `quantity`, `price`, `expiry_date`, `med_name`, `category_name`) VALUES
 (1, 3, 61, 76.80, NULL, 'Ibuprofen', 'Analgesics'),
 (2, 10, 89, 33.91, NULL, 'Diclofenac', 'Analgesics'),
@@ -1553,6 +1552,7 @@ INSERT INTO `medication_categories` (`category_id`, `category_name`) VALUES
 (8, 'Respiratory'),
 (25, 'Supplements'),
 (4, 'Vitamins');
+
 
 --
 -- Dumping data for table `purchases`
