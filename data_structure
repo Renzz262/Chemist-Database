@@ -1,94 +1,134 @@
-CREATE DATABASE IF NOT EXISTS `pharmacy_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `pharmacy_db`;
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Jan 29, 2026 at 08:17 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
-DELIMITER $$
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
-DROP FUNCTION IF EXISTS `fn_medication_status`$$
-CREATE DEFINER=`root`@`localhost` FUNCTION `fn_medication_status` (`p_med_id` INT) RETURNS VARCHAR(20) CHARSET utf8mb4 COLLATE utf8mb4_general_ci DETERMINISTIC BEGIN
-    DECLARE qty INT;
 
-    SELECT quantity
-    INTO qty
-    FROM inventory
-    WHERE med_id = p_med_id;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
-    IF qty > 0 THEN
-        RETURN 'IN STOCK';
-    ELSE
-        RETURN 'OUT OF STOCK';
-    END IF;
-END$$
+--
+-- Database: `pharmacy_db`
+--
 
-DROP FUNCTION IF EXISTS `fn_medication_stock_value`$$
-CREATE DEFINER=`root`@`localhost` FUNCTION `fn_medication_stock_value` (`p_med_id` INT) RETURNS DECIMAL(10,2) DETERMINISTIC BEGIN
-    DECLARE total_value DECIMAL(10,2);
+-- --------------------------------------------------------
 
-    SELECT quantity * price
-    INTO total_value
-    FROM inventory
-    WHERE med_id = p_med_id;
-
-    RETURN IFNULL(total_value, 0);
-END$$
-
-DROP FUNCTION IF EXISTS `is_expired`$$
-CREATE DEFINER=`root`@`localhost` FUNCTION `is_expired` (`expiry` DATE) RETURNS TINYINT(1) DETERMINISTIC BEGIN
-    RETURN expiry < CURDATE();
-END$$
-
-DELIMITER ;
-
+--
+-- Table structure for table `inventory`
+--
 
 DROP TABLE IF EXISTS `inventory`;
-CREATE TABLE `inventory` (
-  `inventory_id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `inventory` (
+  `inventory_id` int(11) NOT NULL AUTO_INCREMENT,
   `med_id` int(11) DEFAULT NULL,
   `quantity` int(11) DEFAULT NULL,
   `price` decimal(10,2) DEFAULT NULL,
-  `expiry_date` date DEFAULT NULL
+  `expiry_date` date DEFAULT NULL,
+  `med_name` varchar(100) DEFAULT NULL,
+  `category_name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`inventory_id`),
+  KEY `med_id` (`med_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Triggers `inventory`
+--
+DROP TRIGGER IF EXISTS `trg_inventory_fill_names`;
+DELIMITER $$
+CREATE TRIGGER `trg_inventory_fill_names` BEFORE INSERT ON `inventory` FOR EACH ROW BEGIN
+    DECLARE v_med_name VARCHAR(100);
+    DECLARE v_category_name VARCHAR(100);
+
+    SELECT m.med_name, mc.category_name
+    INTO v_med_name, v_category_name
+    FROM medications m
+    JOIN medication_categories mc ON m.category_id = mc.category_id
+    WHERE m.med_id = NEW.med_id;
+
+    SET NEW.med_name = v_med_name;
+    SET NEW.category_name = v_category_name;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `medications`
+--
 
 DROP TABLE IF EXISTS `medications`;
-CREATE TABLE `medications` (
-  `med_id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `medications` (
+  `med_id` int(11) NOT NULL AUTO_INCREMENT,
   `med_name` varchar(100) NOT NULL,
   `category_id` int(11) DEFAULT NULL,
-  `description` text DEFAULT NULL
+  `description` text DEFAULT NULL,
+  `category_name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`med_id`),
+  KEY `category_id` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
-
+--
+-- Table structure for table `medication_categories`
+--
 
 DROP TABLE IF EXISTS `medication_categories`;
-CREATE TABLE `medication_categories` (
-  `category_id` int(11) NOT NULL,
-  `category_name` varchar(100) NOT NULL
+CREATE TABLE IF NOT EXISTS `medication_categories` (
+  `category_id` int(11) NOT NULL AUTO_INCREMENT,
+  `category_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`category_id`),
+  UNIQUE KEY `category_name` (`category_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
 
+--
+-- Table structure for table `purchases`
+--
 
 DROP TABLE IF EXISTS `purchases`;
-CREATE TABLE `purchases` (
-  `purchase_id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `purchases` (
+  `purchase_id` int(11) NOT NULL AUTO_INCREMENT,
   `supplier_id` int(11) DEFAULT NULL,
   `purchase_date` date DEFAULT NULL,
-  `total_amount` decimal(10,2) DEFAULT NULL
+  `total_amount` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`purchase_id`),
+  KEY `supplier_id` (`supplier_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
 
+--
+-- Table structure for table `purchase_details`
+--
 
 DROP TABLE IF EXISTS `purchase_details`;
-CREATE TABLE `purchase_details` (
-  `purchase_detail_id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `purchase_details` (
+  `purchase_detail_id` int(11) NOT NULL AUTO_INCREMENT,
   `purchase_id` int(11) DEFAULT NULL,
   `med_id` int(11) DEFAULT NULL,
   `quantity` int(11) DEFAULT NULL,
-  `cost` decimal(10,2) DEFAULT NULL
+  `cost` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`purchase_detail_id`),
+  KEY `purchase_id` (`purchase_id`),
+  KEY `med_id` (`med_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
+--
+-- Triggers `purchase_details`
+--
 DROP TRIGGER IF EXISTS `trg_increase_stock_after_purchase`;
 DELIMITER $$
 CREATE TRIGGER `trg_increase_stock_after_purchase` AFTER INSERT ON `purchase_details` FOR EACH ROW BEGIN
@@ -99,26 +139,41 @@ END
 $$
 DELIMITER ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sales`
+--
 
 DROP TABLE IF EXISTS `sales`;
-CREATE TABLE `sales` (
-  `sale_id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `sales` (
+  `sale_id` int(11) NOT NULL AUTO_INCREMENT,
   `sale_date` date DEFAULT NULL,
-  `total_amount` decimal(10,2) DEFAULT NULL
+  `total_amount` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`sale_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
 
+--
+-- Table structure for table `sale_details`
+--
 
 DROP TABLE IF EXISTS `sale_details`;
-CREATE TABLE `sale_details` (
-  `sale_detail_id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `sale_details` (
+  `sale_detail_id` int(11) NOT NULL AUTO_INCREMENT,
   `sale_id` int(11) DEFAULT NULL,
   `med_id` int(11) DEFAULT NULL,
   `quantity` int(11) DEFAULT NULL,
-  `price` decimal(10,2) DEFAULT NULL
+  `price` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`sale_detail_id`),
+  KEY `sale_id` (`sale_id`),
+  KEY `med_id` (`med_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
+--
+-- Triggers `sale_details`
+--
 DROP TRIGGER IF EXISTS `trg_prevent_negative_stock`;
 DELIMITER $$
 CREATE TRIGGER `trg_prevent_negative_stock` BEFORE INSERT ON `sale_details` FOR EACH ROW BEGIN
@@ -145,20 +200,30 @@ END
 $$
 DELIMITER ;
 
+-- --------------------------------------------------------
 
+--
+-- Table structure for table `suppliers`
+--
 
 DROP TABLE IF EXISTS `suppliers`;
-CREATE TABLE `suppliers` (
-  `supplier_id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `suppliers` (
+  `supplier_id` int(11) NOT NULL AUTO_INCREMENT,
   `supplier_name` varchar(100) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
   `email` varchar(50) DEFAULT NULL,
-  `address` varchar(200) DEFAULT NULL
+  `address` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`supplier_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
 
+--
+-- Stand-in structure for view `view_low_stock`
+-- (See below for the actual view)
+--
 DROP VIEW IF EXISTS `view_low_stock`;
-CREATE TABLE `view_low_stock` (
+CREATE TABLE IF NOT EXISTS `view_low_stock` (
 `med_id` int(11)
 ,`med_name` varchar(100)
 ,`category_name` varchar(100)
@@ -166,9 +231,14 @@ CREATE TABLE `view_low_stock` (
 ,`price` decimal(42,2)
 );
 
+-- --------------------------------------------------------
 
+--
+-- Stand-in structure for view `view_medication_inventory`
+-- (See below for the actual view)
+--
 DROP VIEW IF EXISTS `view_medication_inventory`;
-CREATE TABLE `view_medication_inventory` (
+CREATE TABLE IF NOT EXISTS `view_medication_inventory` (
 `med_id` int(11)
 ,`med_name` varchar(100)
 ,`category_name` varchar(100)
@@ -176,9 +246,14 @@ CREATE TABLE `view_medication_inventory` (
 ,`price` decimal(42,2)
 );
 
+-- --------------------------------------------------------
 
+--
+-- Stand-in structure for view `view_purchase_details`
+-- (See below for the actual view)
+--
 DROP VIEW IF EXISTS `view_purchase_details`;
-CREATE TABLE `view_purchase_details` (
+CREATE TABLE IF NOT EXISTS `view_purchase_details` (
 `purchase_id` int(11)
 ,`purchase_date` date
 ,`med_id` int(11)
@@ -188,9 +263,14 @@ CREATE TABLE `view_purchase_details` (
 ,`total_cost` decimal(20,2)
 );
 
+-- --------------------------------------------------------
 
+--
+-- Stand-in structure for view `view_sales_details`
+-- (See below for the actual view)
+--
 DROP VIEW IF EXISTS `view_sales_details`;
-CREATE TABLE `view_sales_details` (
+CREATE TABLE IF NOT EXISTS `view_sales_details` (
 `sale_id` int(11)
 ,`sale_date` date
 ,`med_id` int(11)
@@ -200,141 +280,107 @@ CREATE TABLE `view_sales_details` (
 ,`total_price` decimal(20,2)
 );
 
+-- --------------------------------------------------------
 
+--
+-- Stand-in structure for view `view_sales_summary`
+-- (See below for the actual view)
+--
 DROP VIEW IF EXISTS `view_sales_summary`;
-CREATE TABLE `view_sales_summary` (
+CREATE TABLE IF NOT EXISTS `view_sales_summary` (
 `med_name` varchar(100)
 ,`total_sold` decimal(32,0)
 ,`total_sales` decimal(42,2)
 );
 
+-- --------------------------------------------------------
+
+--
+-- Structure for view `view_low_stock`
+--
 DROP TABLE IF EXISTS `view_low_stock`;
 
 DROP VIEW IF EXISTS `view_low_stock`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_low_stock`  AS SELECT `view_medication_inventory`.`med_id` AS `med_id`, `view_medication_inventory`.`med_name` AS `med_name`, `view_medication_inventory`.`category_name` AS `category_name`, `view_medication_inventory`.`quantity` AS `quantity`, `view_medication_inventory`.`price` AS `price` FROM `view_medication_inventory` WHERE `view_medication_inventory`.`quantity` <= 10 ;
 
+-- --------------------------------------------------------
 
+--
+-- Structure for view `view_medication_inventory`
+--
 DROP TABLE IF EXISTS `view_medication_inventory`;
 
 DROP VIEW IF EXISTS `view_medication_inventory`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_medication_inventory`  AS SELECT `m`.`med_id` AS `med_id`, `m`.`med_name` AS `med_name`, `c`.`category_name` AS `category_name`, ifnull(sum(`pd`.`quantity`),0) - ifnull(sum(`sd`.`quantity`),0) AS `quantity`, ifnull(sum(`sd`.`price` * `sd`.`quantity`),0) AS `price` FROM (((`medications` `m` join `medication_categories` `c` on(`m`.`category_id` = `c`.`category_id`)) left join `purchase_details` `pd` on(`m`.`med_id` = `pd`.`med_id`)) left join `sale_details` `sd` on(`m`.`med_id` = `sd`.`med_id`)) GROUP BY `m`.`med_id`, `m`.`med_name`, `c`.`category_name` ;
 
+-- --------------------------------------------------------
 
+--
+-- Structure for view `view_purchase_details`
+--
 DROP TABLE IF EXISTS `view_purchase_details`;
 
 DROP VIEW IF EXISTS `view_purchase_details`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_purchase_details`  AS SELECT `p`.`purchase_id` AS `purchase_id`, `p`.`purchase_date` AS `purchase_date`, `pd`.`med_id` AS `med_id`, `m`.`med_name` AS `med_name`, `pd`.`quantity` AS `quantity`, `pd`.`cost` AS `cost`, `pd`.`quantity`* `pd`.`cost` AS `total_cost` FROM ((`purchases` `p` join `purchase_details` `pd` on(`p`.`purchase_id` = `pd`.`purchase_id`)) join `medications` `m` on(`pd`.`med_id` = `m`.`med_id`)) ;
 
+-- --------------------------------------------------------
 
+--
+-- Structure for view `view_sales_details`
+--
 DROP TABLE IF EXISTS `view_sales_details`;
 
 DROP VIEW IF EXISTS `view_sales_details`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_sales_details`  AS SELECT `s`.`sale_id` AS `sale_id`, `s`.`sale_date` AS `sale_date`, `sd`.`med_id` AS `med_id`, `m`.`med_name` AS `med_name`, `sd`.`quantity` AS `quantity`, `sd`.`price` AS `price`, `sd`.`quantity`* `sd`.`price` AS `total_price` FROM ((`sales` `s` join `sale_details` `sd` on(`s`.`sale_id` = `sd`.`sale_id`)) join `medications` `m` on(`sd`.`med_id` = `m`.`med_id`)) ;
 
+-- --------------------------------------------------------
+
+--
+-- Structure for view `view_sales_summary`
+--
 DROP TABLE IF EXISTS `view_sales_summary`;
 
 DROP VIEW IF EXISTS `view_sales_summary`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_sales_summary`  AS SELECT `m`.`med_name` AS `med_name`, sum(`sd`.`quantity`) AS `total_sold`, sum(`sd`.`quantity` * `sd`.`price`) AS `total_sales` FROM (`sale_details` `sd` join `medications` `m` on(`sd`.`med_id` = `m`.`med_id`)) GROUP BY `m`.`med_name` ;
 
+--
+-- Constraints for dumped tables
+--
 
-ALTER TABLE `inventory`
-  ADD PRIMARY KEY (`inventory_id`),
-  ADD KEY `med_id` (`med_id`);
-
-
-ALTER TABLE `medications`
-  ADD PRIMARY KEY (`med_id`),
-  ADD KEY `category_id` (`category_id`);
-
-
-ALTER TABLE `medication_categories`
-  ADD PRIMARY KEY (`category_id`),
-  ADD UNIQUE KEY `category_name` (`category_name`);
-
-
-ALTER TABLE `purchases`
-  ADD PRIMARY KEY (`purchase_id`),
-  ADD KEY `supplier_id` (`supplier_id`);
-
-
-ALTER TABLE `purchase_details`
-  ADD PRIMARY KEY (`purchase_detail_id`),
-  ADD KEY `purchase_id` (`purchase_id`),
-  ADD KEY `med_id` (`med_id`);
-
-
-ALTER TABLE `sales`
-  ADD PRIMARY KEY (`sale_id`);
-
-
-ALTER TABLE `sale_details`
-  ADD PRIMARY KEY (`sale_detail_id`),
-  ADD KEY `sale_id` (`sale_id`),
-  ADD KEY `med_id` (`med_id`);
-
-ALTER TABLE `suppliers`
-  ADD PRIMARY KEY (`supplier_id`);
-
-ALTER TABLE `inventory`
-  MODIFY `inventory_id` int(11) NOT NULL AUTO_INCREMENT;
-
-
-ALTER TABLE `medications`
-  MODIFY `med_id` int(11) NOT NULL AUTO_INCREMENT;
-
-
-ALTER TABLE `medication_categories`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT;
-
-
-ALTER TABLE `purchases`
-  MODIFY `purchase_id` int(11) NOT NULL AUTO_INCREMENT;
-
-
-ALTER TABLE `purchase_details`
-  MODIFY `purchase_detail_id` int(11) NOT NULL AUTO_INCREMENT;
-
-
-ALTER TABLE `sales`
-  MODIFY `sale_id` int(11) NOT NULL AUTO_INCREMENT;
-
-
-ALTER TABLE `sale_details`
-  MODIFY `sale_detail_id` int(11) NOT NULL AUTO_INCREMENT;
-
-
-ALTER TABLE `suppliers`
-  MODIFY `supplier_id` int(11) NOT NULL AUTO_INCREMENT;
-
+--
+-- Constraints for table `inventory`
+--
 ALTER TABLE `inventory`
   ADD CONSTRAINT `inventory_ibfk_1` FOREIGN KEY (`med_id`) REFERENCES `medications` (`med_id`);
 
-
+--
+-- Constraints for table `medications`
+--
 ALTER TABLE `medications`
   ADD CONSTRAINT `medications_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `medication_categories` (`category_id`);
 
-
+--
+-- Constraints for table `purchases`
+--
 ALTER TABLE `purchases`
   ADD CONSTRAINT `purchases_ibfk_1` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`supplier_id`);
 
-
+--
+-- Constraints for table `purchase_details`
+--
 ALTER TABLE `purchase_details`
   ADD CONSTRAINT `purchase_details_ibfk_1` FOREIGN KEY (`purchase_id`) REFERENCES `purchases` (`purchase_id`),
   ADD CONSTRAINT `purchase_details_ibfk_2` FOREIGN KEY (`med_id`) REFERENCES `medications` (`med_id`);
 
-
+--
+-- Constraints for table `sale_details`
+--
 ALTER TABLE `sale_details`
   ADD CONSTRAINT `sale_details_ibfk_1` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`sale_id`),
   ADD CONSTRAINT `sale_details_ibfk_2` FOREIGN KEY (`med_id`) REFERENCES `medications` (`med_id`);
-
-DELIMITER $$
-
-DROP EVENT IF EXISTS `ev_auto_mark_expired`$$
-CREATE DEFINER=`root`@`localhost` EVENT `ev_auto_mark_expired` ON SCHEDULE EVERY 1 DAY STARTS '2026-01-28 14:00:27' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
-    UPDATE inventory
-    SET status = 'EXPIRED'
-    WHERE expiry_date < CURDATE();
-END$$
-
-DELIMITER ;
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
