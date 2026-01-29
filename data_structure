@@ -52,7 +52,6 @@ CREATE TABLE IF NOT EXISTS `medications` (
   KEY `category_id` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
 --
 -- Table structure for table `medication_categories`
 --
@@ -64,7 +63,6 @@ CREATE TABLE IF NOT EXISTS `medication_categories` (
   PRIMARY KEY (`category_id`),
   UNIQUE KEY `category_name` (`category_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 
 -- Table structure for table `purchases`
 
