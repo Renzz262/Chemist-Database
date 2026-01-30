@@ -180,6 +180,20 @@ CREATE TABLE IF NOT EXISTS `sales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
+DELIMITER $$
+
+CREATE TRIGGER trg_after_sale_insert
+AFTER INSERT ON sales
+FOR EACH ROW
+BEGIN
+    IF NEW.customer_id IS NOT NULL THEN
+        CALL add_customer_points(NEW.customer_id);
+    END IF;
+END$$
+
+DELIMITER ;
+
+
 
 DROP TABLE IF EXISTS `sale_details`;
 CREATE TABLE IF NOT EXISTS `sale_details` (
