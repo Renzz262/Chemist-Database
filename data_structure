@@ -28,6 +28,29 @@ CREATE TABLE IF NOT EXISTS `customer_points` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
+DELIMITER $$
+
+CREATE PROCEDURE add_customer_points(IN p_customer_id INT)
+BEGIN
+    DECLARE remaining_days INT;
+    DECLARE earned_points INT;
+
+    -- Calculate remaining days in the current month
+    SET remaining_days = DAY(LAST_DAY(CURDATE())) - DAY(CURDATE());
+
+    -- Calculate earned points
+    SET earned_points = FLOOR(remaining_days / 8);
+
+    -- Insert or update customer points
+    INSERT INTO customer_points (customer_id, total_points, created_date, last_updated)
+    VALUES (p_customer_id, earned_points, CURDATE(), CURDATE())
+    ON DUPLICATE KEY UPDATE
+        total_points = total_points + earned_points,
+        last_updated = CURDATE();
+END$$
+
+DELIMITER ;
+
 
 DROP TABLE IF EXISTS `inventory`;
 CREATE TABLE IF NOT EXISTS `inventory` (
