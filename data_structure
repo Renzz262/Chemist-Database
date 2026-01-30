@@ -82,6 +82,8 @@ END$$
 
 DELIMITER ;
 
+CALL generate_inventory_data();
+SELECT COUNT(*) FROM inventory;
 
 
 
