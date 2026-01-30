@@ -363,3 +363,10 @@ ALTER TABLE `sale_details`
   ADD CONSTRAINT `sale_details_ibfk_2` FOREIGN KEY (`med_id`) REFERENCES `medications` (`med_id`);
 COMMIT;
 
+
+CREATE INDEX idx_sales_date ON sales (sale_date);
+CREATE INDEX idx_medications_category_id ON medications (category_id);
+CREATE INDEX idx_sale_details_sale_id ON sale_details (sale_id);
+CREATE INDEX idx_sale_details_med_id ON sale_details (med_id);
+CREATE INDEX idx_category_name ON medication_categories (category_name);
+CREATE INDEX idx_med_name ON medications (med_name);
