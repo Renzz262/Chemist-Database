@@ -43,6 +43,46 @@ CREATE TABLE IF NOT EXISTS `inventory` (
   KEY `med_id` (`med_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+DELIMITER $$
+
+CREATE PROCEDURE generate_inventory_data()
+BEGIN
+    DECLARE i INT DEFAULT 1;
+    DECLARE max_med_id INT;
+
+    -- Get highest med_id available
+    SELECT MAX(med_id) INTO max_med_id FROM medications;
+
+    WHILE i <= 100000 DO
+        INSERT INTO inventory (
+            med_id,
+            quantity,
+            price,
+            expiry_date,
+            med_name,
+            category_name,
+            status
+        )
+        SELECT
+            m.med_id,
+            FLOOR(RAND() * 200) + 1,                      -- quantity 1–200
+            ROUND(RAND() * 500 + 10, 2),                  -- price 10–510
+            DATE_ADD(CURDATE(), INTERVAL FLOOR(RAND() * 720) DAY), -- expiry up to 2 years
+            m.med_name,
+            mc.category_name,
+            IF(RAND() > 0.1, 'ACTIVE', 'EXPIRED')         -- 90% ACTIVE
+        FROM medications m
+        JOIN medication_categories mc ON m.category_id = mc.category_id
+        WHERE m.med_id = (i MOD max_med_id) + 1
+        LIMIT 1;
+
+        SET i = i + 1;
+    END WHILE;
+END$$
+
+DELIMITER ;
+
+
 
 
 DROP TABLE IF EXISTS `medications`;
