@@ -193,6 +193,10 @@ END$$
 
 DELIMITER ;
 
+INSERT INTO sales (sale_date, total_amount, customer_id)
+VALUES (CURDATE(), 2500.00, 1);
+
+SELECT * FROM customer_points WHERE customer_id = 1;
 
 
 DROP TABLE IF EXISTS `sale_details`;
