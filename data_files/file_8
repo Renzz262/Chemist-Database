@@ -1,3 +1,4 @@
+INSERT INTO `inventory` (`inventory_id`, `med_id`, `quantity`, `price`, `expiry_date`, `med_name`, `category_name`, `status`) VALUES
 (105666, 22, 163, 29.99, '2027-08-01', 'Aspirin', 'Antihistamines', 'ACTIVE'),
 (105667, 3, 40, 476.18, '2026-03-20', 'Ibuprofen', 'Analgesics', 'ACTIVE'),
 (105668, 7, 10, 96.15, '2027-07-05', 'Artemether', 'Antimalarials', 'ACTIVE'),
@@ -15221,3 +15222,4 @@ INSERT INTO `inventory` (`inventory_id`, `med_id`, `quantity`, `price`, `expiry_
 (120862, 6, 144, 260.20, '2026-10-05', 'Metformin', 'Antihistamines', 'ACTIVE'),
 (120863, 2, 29, 311.80, '2027-04-01', 'Paracetamol', 'Antibiotics', 'ACTIVE'),
 (120864, 20, 85, 18.22, '2027-09-06', 'Amlodipine', 'Cardiovascular', 'EXPIRED'),
+
