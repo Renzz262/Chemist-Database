@@ -1,30 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1
--- Generation Time: Jan 30, 2026 at 09:22 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `pharmacy_db`
---
-
---
--- Dumping data for table `customers`
---
-
 INSERT INTO `customers` (`customer_id`, `customer_name`, `email`, `phone`, `address`, `date_joined`) VALUES
 (1, 'John Mwangi', 'john@gmail.com', '0712345678', 'Nairobi', '2026-01-29'),
 (2, 'Mary Wanjiku', 'mary@gmail.com', '0723456789', 'Kiambu', '2026-01-29'),
@@ -76,9 +49,6 @@ INSERT INTO `customers` (`customer_id`, `customer_name`, `email`, `phone`, `addr
 (48, 'Ted Malik', 'Malik@gmail.com', '0709292606', 'Bungoma', '2026-01-29'),
 (49, 'Aisha Kanuri', 'AKanuri@gmail.com', '0702127206', 'Nairobi', '2026-01-29');
 
---
--- Dumping data for table `customer_points`
---
 
 INSERT INTO `customer_points` (`customer_id`, `email`, `total_points`, `created_date`, `last_updated`) VALUES
 (1, 'john@gmail.com', 15, '2026-01-29', '2026-01-29'),
@@ -131,9 +101,6 @@ INSERT INTO `customer_points` (`customer_id`, `email`, `total_points`, `created_
 (48, 'Malik@gmail.com', 0, '2026-01-29', NULL),
 (49, 'AKanuri@gmail.com', 0, '2026-01-29', NULL);
 
---
--- Dumping data for table `inventory`
---
 
 INSERT INTO `inventory` (`inventory_id`, `med_id`, `quantity`, `price`, `expiry_date`, `med_name`, `category_name`, `status`) VALUES
 (1, 3, 61, 76.80, '2027-06-30', 'Ibuprofen', 'Analgesics', 'ACTIVE'),
@@ -926,10 +893,6 @@ INSERT INTO `medications` (`med_id`, `med_name`, `category_id`, `category_name`)
 (49, 'Atorvastatin', 3, 'Antimalarials'),
 (57, 'Azithromycin', 8, 'Respiratory');
 
---
--- Dumping data for table `medication_categories`
---
-
 INSERT INTO `medication_categories` (`category_id`, `category_name`) VALUES
 (1, 'Analgesics'),
 (27, 'Anti-inflammatories'),
@@ -951,9 +914,6 @@ INSERT INTO `medication_categories` (`category_id`, `category_name`) VALUES
 (25, 'Supplements'),
 (4, 'Vitamins');
 
---
--- Dumping data for table `medication_name_pool`
---
 
 INSERT INTO `medication_name_pool` (`name`) VALUES
 ('Amlodipine'),
@@ -977,9 +937,6 @@ INSERT INTO `medication_name_pool` (`name`) VALUES
 ('Prednisolone'),
 ('Salbutamol');
 
---
--- Dumping data for table `purchases`
---
 
 INSERT INTO `purchases` (`purchase_id`, `supplier_id`, `purchase_date`, `total_amount`) VALUES
 (1, 7, '2025-05-18', 605.40),
@@ -1085,10 +1042,6 @@ INSERT INTO `purchases` (`purchase_id`, `supplier_id`, `purchase_date`, `total_a
 (101, 1, '2025-01-10', 4500.00),
 (102, 2, '2025-01-11', 3200.00),
 (103, 3, '2025-01-12', 6100.00);
-
---
--- Dumping data for table `purchase_details`
---
 
 INSERT INTO `purchase_details` (`purchase_detail_id`, `purchase_id`, `supplier_name`, `med_id`, `med_name`, `quantity`, `cost`) VALUES
 (1, 11, 'Health Supplies Ltd', 10, 'Ciprofloxacin', 1, 39.51),
@@ -1792,9 +1745,6 @@ INSERT INTO `purchase_details` (`purchase_detail_id`, `purchase_id`, `supplier_n
 (699, 69, 'MediCare Distributors', 1, 'Panadol', 8, 27.84),
 (700, 40, 'MedLink Solutions', 6, 'Metformin', 19, 22.54);
 
---
--- Dumping data for table `sales`
---
 
 INSERT INTO `sales` (`sale_id`, `sale_date`, `total_amount`, `customer_id`) VALUES
 (1, '2025-11-16', 1209.46, 37),
@@ -1901,9 +1851,6 @@ INSERT INTO `sales` (`sale_id`, `sale_date`, `total_amount`, `customer_id`) VALU
 (102, '2025-02-02', 2200.00, 2),
 (103, '2025-02-03', 1800.00, 3);
 
---
--- Dumping data for table `sale_details`
---
 
 INSERT INTO `sale_details` (`sale_detail_id`, `sale_id`, `customer_id`, `customer_name`, `med_id`, `med_name`, `quantity`, `price`) VALUES
 (1, 68, 47, 'Kevin Ngum', 19, 'Insulin', 15, 12.95),
@@ -2637,6 +2584,3 @@ INSERT INTO `suppliers` (`supplier_id`, `supplier_name`, `phone`, `email`, `addr
 (20, 'BrightCare Distributors', '0701234567', 'contact@brightcare.co.ke', 'Machakos, Kenya');
 COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
