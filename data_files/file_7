@@ -15117,4 +15117,5 @@ INSERT INTO `inventory` (`inventory_id`, `med_id`, `quantity`, `price`, `expiry_
 (105662, 3, 193, 348.50, '2027-01-18', 'Ibuprofen', 'Analgesics', 'ACTIVE'),
 (105663, 10, 68, 342.74, '2026-09-10', 'Ciprofloxacin', 'Analgesics', 'ACTIVE'),
 (105664, 49, 23, 252.48, '2026-03-29', 'Atorvastatin', 'Antimalarials', 'ACTIVE'),
-(105665, 22, 93, 87.85, '2026-11-11', 'Aspirin', 'Antihistamines', 'ACTIVE'),
+(105665, 22, 93, 87.85, '2026-11-11', 'Aspirin', 'Antihistamines', 'ACTIVE');
+
