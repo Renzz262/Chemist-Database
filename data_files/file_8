@@ -15221,5 +15221,6 @@ INSERT INTO `inventory` (`inventory_id`, `med_id`, `quantity`, `price`, `expiry_
 (120861, 10, 122, 23.09, '2026-09-05', 'Ciprofloxacin', 'Analgesics', 'ACTIVE'),
 (120862, 6, 144, 260.20, '2026-10-05', 'Metformin', 'Antihistamines', 'ACTIVE'),
 (120863, 2, 29, 311.80, '2027-04-01', 'Paracetamol', 'Antibiotics', 'ACTIVE'),
-(120864, 20, 85, 18.22, '2027-09-06', 'Amlodipine', 'Cardiovascular', 'EXPIRED'),
+(120864, 20, 85, 18.22, '2027-09-06', 'Amlodipine', 'Cardiovascular', 'EXPIRED');
+
 
