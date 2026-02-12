@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS `customers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
-
 DROP TABLE IF EXISTS `customer_points`;
 CREATE TABLE IF NOT EXISTS `customer_points` (
   `customer_id` int(11) NOT NULL,
@@ -109,7 +108,6 @@ CALL generate_inventory_data();
 SELECT COUNT(*) FROM inventory;
 
 
-
 DROP TABLE IF EXISTS `medications`;
 CREATE TABLE IF NOT EXISTS `medications` (
   `med_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -120,7 +118,6 @@ CREATE TABLE IF NOT EXISTS `medications` (
   UNIQUE KEY `med_name` (`med_name`),
   KEY `category_id` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 
 
 DROP TABLE IF EXISTS `medication_categories`;
