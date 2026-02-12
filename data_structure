@@ -2,7 +2,6 @@
 CREATE DATABASE IF NOT EXISTS `pharmacy_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `pharmacy_db`;
 
-
 DROP TABLE IF EXISTS `customers`;
 CREATE TABLE IF NOT EXISTS `customers` (
   `customer_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -14,7 +13,6 @@ CREATE TABLE IF NOT EXISTS `customers` (
   PRIMARY KEY (`customer_id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 
 DROP TABLE IF EXISTS `customer_points`;
 CREATE TABLE IF NOT EXISTS `customer_points` (
@@ -49,7 +47,6 @@ BEGIN
 END$$
 
 DELIMITER ;
-
 
 DROP TABLE IF EXISTS `inventory`;
 CREATE TABLE IF NOT EXISTS `inventory` (
@@ -107,7 +104,6 @@ DELIMITER ;
 CALL generate_inventory_data();
 SELECT COUNT(*) FROM inventory;
 
-
 DROP TABLE IF EXISTS `medications`;
 CREATE TABLE IF NOT EXISTS `medications` (
   `med_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -135,7 +131,6 @@ CREATE TABLE IF NOT EXISTS `medication_name_pool` (
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 
 
 DROP TABLE IF EXISTS `purchases`;
